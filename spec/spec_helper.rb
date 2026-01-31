@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require "simplecov"
+require 'simplecov'
 SimpleCov.start do
-  add_filter "/spec/"
+  add_filter '/spec/'
 end
 
-require "bundler/setup"
-require "omniauth-quickbooks-oauth2-modern"
-require "webmock/rspec"
-require "rack/test"
+require 'bundler/setup'
+require 'omniauth-quickbooks-oauth2-modern'
+require 'webmock/rspec'
+require 'rack/test'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -21,7 +21,7 @@ RSpec.configure do |config|
 
   config.shared_context_metadata_behavior = :apply_to_host_groups
   config.filter_run_when_matching :focus
-  config.example_status_persistence_file_path = ".rspec_status"
+  config.example_status_persistence_file_path = '.rspec_status'
   config.disable_monkey_patching!
   config.order = :random
   Kernel.srand config.seed

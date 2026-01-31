@@ -101,7 +101,10 @@ module OmniAuth
       # @param refresh_token [String] The refresh token to use
       # @return [TokenResult] Result object with new tokens or error
       def refresh_token(refresh_token)
-        return TokenResult.new(success: false, error: 'Refresh token is required') if refresh_token.nil? || refresh_token.empty?
+        if refresh_token.nil? || refresh_token.empty?
+          return TokenResult.new(success: false,
+                                 error: 'Refresh token is required')
+        end
 
         response = make_refresh_request(refresh_token)
 

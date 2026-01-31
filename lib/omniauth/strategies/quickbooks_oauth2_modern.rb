@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "omniauth-oauth2"
-require "faraday"
-require "json"
+require 'omniauth-oauth2'
+require 'faraday'
+require 'json'
 
 module OmniAuth
   module Strategies
@@ -24,15 +24,15 @@ module OmniAuth
       option :name, :quickbooks_oauth2_modern
 
       # Default scopes for QuickBooks accounting access with OpenID
-      option :scope, "com.intuit.quickbooks.accounting openid profile email"
+      option :scope, 'com.intuit.quickbooks.accounting openid profile email'
 
       # Sandbox mode (default: true for safety)
       option :sandbox, true
 
       option :client_options, {
-        site: "https://appcenter.intuit.com",
-        authorize_url: "/connect/oauth2",
-        token_url: "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
+        site: 'https://appcenter.intuit.com',
+        authorize_url: '/connect/oauth2',
+        token_url: 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer'
       }
 
       # Use realmId (company ID) as the unique identifier
@@ -40,20 +40,20 @@ module OmniAuth
 
       info do
         {
-          email: raw_info["email"],
-          first_name: raw_info["givenName"],
-          last_name: raw_info["familyName"],
+          email: raw_info['email'],
+          first_name: raw_info['givenName'],
+          last_name: raw_info['familyName'],
           name: full_name,
-          phone: raw_info["phoneNumber"],
+          phone: raw_info['phoneNumber'],
           realm_id: realm_id
         }
       end
 
       credentials do
-        hash = { "token" => access_token.token }
-        hash["refresh_token"] = access_token.refresh_token if access_token.refresh_token
-        hash["expires_at"] = access_token.expires_at if access_token.expires_at
-        hash["expires"] = access_token.expires?
+        hash = { 'token' => access_token.token }
+        hash['refresh_token'] = access_token.refresh_token if access_token.refresh_token
+        hash['expires_at'] = access_token.expires_at if access_token.expires_at
+        hash['expires'] = access_token.expires?
         hash
       end
 
@@ -78,12 +78,12 @@ module OmniAuth
 
       # The QuickBooks company ID (realmId)
       def realm_id
-        request.params["realmId"]
+        request.params['realmId']
       end
 
       # Construct full name from OpenID info
       def full_name
-        name = [raw_info["givenName"], raw_info["familyName"]].compact.join(" ")
+        name = [raw_info['givenName'], raw_info['familyName']].compact.join(' ')
         name.empty? ? nil : name
       end
 
@@ -101,13 +101,13 @@ module OmniAuth
 
       # Check if OpenID scopes were requested
       def openid_scope_requested?
-        scope = options[:scope] || ""
-        scope.split(/\s+/).include?("openid")
+        scope = options[:scope] || ''
+        scope.split(/\s+/).include?('openid')
       end
 
       # Get the appropriate userinfo URL based on environment
       def userinfo_url
-        domain = options[:sandbox] ? "sandbox-accounts.platform.intuit.com" : "accounts.platform.intuit.com"
+        domain = options[:sandbox] ? 'sandbox-accounts.platform.intuit.com' : 'accounts.platform.intuit.com'
         "https://#{domain}/v1/openid_connect/userinfo"
       end
     end

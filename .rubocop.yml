@@ -1,9 +1,11 @@
+require:
+  - rubocop-rspec
+
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
   Exclude:
     - "vendor/**/*"
-    - "spec/**/*"
 
 Style/Documentation:
   Enabled: false
@@ -12,3 +14,49 @@ Metrics/BlockLength:
   Exclude:
     - "spec/**/*"
     - "*.gemspec"
+
+Metrics/ClassLength:
+  Max: 150
+
+Metrics/MethodLength:
+  Max: 25
+
+Metrics/AbcSize:
+  Max: 25
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+RSpec/SubjectStub:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+RSpec/FilePath:
+  Enabled: false
+
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/ExampleLength:
+  Max: 15
+
+RSpec/NestedGroups:
+  Max: 5
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/DescribedClass:
+  Enabled: false
+
+Naming/FileName:
+  Exclude:
+    - 'lib/omniauth-quickbooks-oauth2-modern.rb'
+
+Metrics/ParameterLists:
+  Max: 8
