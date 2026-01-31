@@ -83,7 +83,8 @@ module OmniAuth
 
       # Construct full name from OpenID info
       def full_name
-        [raw_info["givenName"], raw_info["familyName"]].compact.join(" ").presence
+        name = [raw_info["givenName"], raw_info["familyName"]].compact.join(" ")
+        name.empty? ? nil : name
       end
 
       # Fetch user info from OpenID Connect userinfo endpoint
