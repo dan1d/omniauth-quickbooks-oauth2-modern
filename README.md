@@ -201,6 +201,102 @@ def self.from_omniauth(auth)
 end
 ```
 
+## Token Refresh
+
+This gem includes a `TokenClient` class to easily refresh tokens in your Rails app.
+
+### Basic Usage
+
+```ruby
+# Create a client instance
+client = OmniAuth::QuickbooksOauth2Modern::TokenClient.new(
+  client_id: ENV['QBO_CLIENT_ID'],
+  client_secret: ENV['QBO_CLIENT_SECRET']
+)
+
+# Refresh an expired token
+result = client.refresh_token(account.qbo_refresh_token)
+
+if result.success?
+  account.update!(
+    qbo_access_token: result.access_token,
+    qbo_refresh_token: result.refresh_token,
+    qbo_token_expires_at: Time.at(result.expires_at)
+  )
+else
+  Rails.logger.error "Token refresh failed: #{result.error}"
+end
+```
+
+### Check Token Expiration
+
+```ruby
+# Check if token is expired (with 5-minute buffer by default)
+client.token_expired?(account.qbo_token_expires_at)
+
+# Custom buffer (e.g., refresh 1 hour before expiry)
+client.token_expired?(account.qbo_token_expires_at, buffer_seconds: 3600)
+```
+
+### Rails Service Example
+
+```ruby
+# app/services/quickbooks_api_service.rb
+class QuickBooksApiService
+  def initialize(account)
+    @account = account
+    @client = OmniAuth::QuickbooksOauth2Modern::TokenClient.new(
+      client_id: ENV['QBO_CLIENT_ID'],
+      client_secret: ENV['QBO_CLIENT_SECRET']
+    )
+  end
+
+  def with_valid_token
+    refresh_if_expired!
+    yield @account.qbo_access_token
+  end
+
+  private
+
+  def refresh_if_expired!
+    return unless @client.token_expired?(@account.qbo_token_expires_at)
+
+    result = @client.refresh_token(@account.qbo_refresh_token)
+    raise "Token refresh failed: #{result.error}" unless result.success?
+
+    @account.update!(
+      qbo_access_token: result.access_token,
+      qbo_refresh_token: result.refresh_token,
+      qbo_token_expires_at: Time.at(result.expires_at)
+    )
+  end
+end
+
+# Usage
+QuickBooksApiService.new(current_account).with_valid_token do |token|
+  # Make API calls with valid token
+  response = Faraday.get("https://quickbooks.api.intuit.com/v3/company/#{realm_id}/query") do |req|
+    req.headers['Authorization'] = "Bearer #{token}"
+    req.params['query'] = "SELECT * FROM Customer"
+  end
+end
+```
+
+### TokenResult Object
+
+The `refresh_token` method returns a `TokenResult` object with:
+
+| Method | Description |
+|--------|-------------|
+| `success?` | Returns `true` if refresh succeeded |
+| `failure?` | Returns `true` if refresh failed |
+| `access_token` | The new access token |
+| `refresh_token` | The new refresh token |
+| `expires_at` | Unix timestamp when token expires |
+| `expires_in` | Seconds until token expires |
+| `error` | Error message if failed |
+| `raw_response` | Full response hash from Intuit |
+
 ## Scopes
 
 Common QuickBooks scopes:
